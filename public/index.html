@@ -1366,69 +1366,20 @@ function updatePillarNav(content) {
 // ══════════════════════════════════════════
 // ANALYSIS
 // ══════════════════════════════════════════
-const ANALYSIS_PROMPT = `Based on the full assessment conversation, return ONLY valid JSON (no markdown, no backticks):
+const ANALYSIS_PROMPT = `Based on the assessment conversation, return ONLY a valid JSON object. No markdown, no backticks, no explanation. Just the raw JSON.
 
-{
-  "pillarScores": {"sleep":0,"sunlight":0,"movement":0,"nutrition":0,"stress":0,"connection":0},
-  "overallScore": 0,
-  "insight": "2-3 sentence personalised insight about this specific person's health picture. Be specific, not generic.",
-  "mateInsight": "1-2 sentences on what Gabor Maté's lens reveals about the root cause pattern here — why they're struggling not just what they're struggling with.",
-  "attiaNote": "1 sentence on their longevity trajectory based on current habits.",
-  "pyramidNote": "Where they are on Helms pyramid and what that means for their priorities.",
-  "gaps": [
-    {
-      "rank": 1,
-      "pillar": "pillar name",
-      "title": "The specific gap in 8 words max",
-      "reason": "Why this is highest priority using Helms hierarchy logic. 2-3 sentences. Specific to them.",
-      "thinker": "Which thinker's framework identifies this gap most clearly",
-      "impact": "High"
-    }
-  ],
-  "habits": [
-    {
-      "id": "h1",
-      "tier": "foundation",
-      "title": "When [specific anchor moment], I will [tiny/small/medium behaviour]",
-      "shortLabel": "2-4 word tracker label e.g. '30 min Z2' or 'No phone' or '10 min walk'",
-      "anchor": "The existing behaviour this attaches to (Fogg anchor moment)",
-      "pillar": "sleep",
-      "difficulty": "tiny",
-      "frequency": "daily",
-      "frequencyDays": [0,1,2,3,4,5,6],
-      "frequencyLabel": "Every day",
-      "why": "One specific sentence on why this habit, why now, for this person.",
-      "thinker": "Clear",
-      "alternatives": [
-        {"difficulty": "tiny", "title": "When X, I will Y (even smaller version)", "shortLabel": "2-4 words", "anchor": "same or different anchor"},
-        {"difficulty": "small", "title": "When X, I will Y (medium version)", "shortLabel": "2-4 words", "anchor": "anchor"},
-        {"difficulty": "medium", "title": "When X, I will Y (full version)", "shortLabel": "2-4 words", "anchor": "anchor"}
-      ]
-    }
-  ]
-}
+Use this exact structure with no additional fields:
 
-SHORT LABEL RULES: shortLabel must be 2-4 words max, no filler. Examples: "30 min Z2", "No phone 9pm", "10 min walk", "Morning light", "Protein first", "5 min breathe", "Cold shower", "Bed by 10:30". This label appears on the tracker — keep it scannable.
+{"pillarScores":{"sleep":7,"sunlight":5,"movement":6,"nutrition":6,"stress":4,"connection":7},"overallScore":6,"insight":"Your personalised insight here in 2 sentences.","mateInsight":"Root cause insight here in 1 sentence.","attiaNote":"Longevity note here in 1 sentence.","pyramidNote":"Helms pyramid note here in 1 sentence.","gaps":[{"rank":1,"pillar":"sleep","title":"Gap title max 6 words","reason":"Why this gap matters most in 2 sentences.","thinker":"Walker","impact":"High"},{"rank":2,"pillar":"stress","title":"Gap title max 6 words","reason":"Why this gap matters in 2 sentences.","thinker":"Maté","impact":"High"}],"habits":[{"id":"h1","tier":"foundation","title":"When I wake up I will go outside for 5 minutes","shortLabel":"Morning light","anchor":"After waking up","pillar":"sunlight","difficulty":"tiny","frequencyDays":[0,1,2,3,4,5,6],"frequencyLabel":"Every day","why":"One sentence why this habit for this person.","thinker":"Huberman","alternatives":[{"difficulty":"tiny","title":"When I make coffee I will stand by the window for 2 minutes","shortLabel":"Window light","anchor":"Making coffee"},{"difficulty":"small","title":"When I wake up I will walk outside for 10 minutes","shortLabel":"10 min outside","anchor":"After waking up"},{"difficulty":"medium","title":"When I wake up I will do a 20 minute outdoor walk","shortLabel":"20 min walk","anchor":"After waking up"}]}]}
 
-FREQUENCY RULES:
-- frequencyDays: array of day indices that are scheduled (0=Mon, 1=Tue, ... 6=Sun)
-- daily habits: [0,1,2,3,4,5,6]
-- weekdays only: [0,1,2,3,4]
-- 3x/week (M/W/F): [0,2,4]
-- 2x/week (Tue/Sat): [1,5]
-- weekends: [5,6]
-- frequencyLabel: human-readable e.g. "Every day", "3x per week", "Weekdays", "Mon · Wed · Fri"
-- Z2 cardio, strength sessions = 3-4x per week. Sleep habits = daily. Sunlight = daily. Breathing = daily.
-
-TIER RULES (critical):
-- "foundation" tier: 2-3 habits. Highest leverage. What must be done first. Address Helms pyramid bottom.
-- "build" tier: 2-3 habits. Add after foundation is solid (2-4 weeks). 
-- "optimise" tier: 2-3 habits. Fine-tuning. Only meaningful if foundation and build are working.
-
-TOTAL: 6-9 habits across 3 tiers. Sequence within tiers from easiest to hardest.
-GAPS: Exactly 3-5 gaps ranked by impact. Use Helms hierarchy.
-ALTERNATIVES: Every habit must have exactly 3 alternatives at different difficulty levels.
-IMPLEMENTATION INTENTIONS: Every habit title must follow "When X, I will Y" format (Clear).`;
+RULES:
+- Return 3-5 gaps total
+- Return 6-9 habits total split across foundation, build, optimise tiers
+- Every habit needs exactly 3 alternatives
+- All strings must use straight double quotes only
+- No apostrophes in text — use "do not" not "don't"
+- No special characters that could break JSON
+- Keep all text values short and simple`;
 
 async function generateAnalysis() {
   const overlay = document.getElementById('loading');
@@ -1438,8 +1389,9 @@ async function generateAnalysis() {
   steps.forEach((id, i) => {
     setTimeout(() => {
       document.querySelectorAll('.loading-step').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }, i * 1200);
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+    }, i * 1400);
   });
 
   const msgs = [...S.messages, {role:'user', content: ANALYSIS_PROMPT}];
@@ -1447,24 +1399,30 @@ async function generateAnalysis() {
   try {
     const raw = await callAPI(msgs, 4000);
 
-    // Robust JSON extraction — find the outermost { } block
+    // Extract JSON block
     let clean = raw.replace(/```json|```/g,'').trim();
-
-    // Find first { and last } to extract just the JSON
     const firstBrace = clean.indexOf('{');
     const lastBrace = clean.lastIndexOf('}');
     if (firstBrace !== -1 && lastBrace !== -1) {
       clean = clean.substring(firstBrace, lastBrace + 1);
     }
 
-    // Fix common JSON issues — trailing commas before } or ]
+    // Fix common AI JSON mistakes
     clean = clean
       .replace(/,\s*}/g, '}')
       .replace(/,\s*]/g, ']')
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' '); // remove control chars
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ')
+      .replace(/\t/g, ' ');
 
     S.analysis = JSON.parse(clean);
-    S.habits = S.analysis.habits.map(h => ({...h, streak: 0, customTitle: null, customAnchor: null, customShortLabel: null, customFrequencyLabel: null}));
+    S.habits = (S.analysis.habits || []).map(h => ({
+      ...h,
+      streak: 0,
+      customTitle: null,
+      customAnchor: null,
+      customShortLabel: null,
+      customFrequencyLabel: null
+    }));
     save();
     overlay.classList.remove('show');
     unlockNav();
@@ -1472,7 +1430,8 @@ async function generateAnalysis() {
     showScreen('results');
   } catch(e) {
     overlay.classList.remove('show');
-    alert('Analysis failed: ' + e.message + '\n\nTry again or continue the conversation.');
+    console.error('Parse error:', e.message);
+    alert('Analysis failed — please hit Generate Analysis again. If it keeps failing, continue the conversation and try once more.');
   }
 }
 
