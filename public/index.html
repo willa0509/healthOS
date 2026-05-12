@@ -1434,7 +1434,6 @@ async function generateAnalysis() {
   const overlay = document.getElementById('loading');
   overlay.classList.add('show');
 
-  // Animate loading steps
   const steps = ['ls1','ls2','ls3','ls4'];
   steps.forEach((id, i) => {
     setTimeout(() => {
@@ -1446,10 +1445,26 @@ async function generateAnalysis() {
   const msgs = [...S.messages, {role:'user', content: ANALYSIS_PROMPT}];
 
   try {
-    const raw = await callAPI(msgs, 3000);
-    const clean = raw.replace(/```json|```/g,'').trim();
+    const raw = await callAPI(msgs, 4000);
+
+    // Robust JSON extraction — find the outermost { } block
+    let clean = raw.replace(/```json|```/g,'').trim();
+
+    // Find first { and last } to extract just the JSON
+    const firstBrace = clean.indexOf('{');
+    const lastBrace = clean.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      clean = clean.substring(firstBrace, lastBrace + 1);
+    }
+
+    // Fix common JSON issues — trailing commas before } or ]
+    clean = clean
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*]/g, ']')
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' '); // remove control chars
+
     S.analysis = JSON.parse(clean);
-    S.habits = S.analysis.habits.map(h => ({...h, streak: 0, customTitle: null, customAnchor: null}));
+    S.habits = S.analysis.habits.map(h => ({...h, streak: 0, customTitle: null, customAnchor: null, customShortLabel: null, customFrequencyLabel: null}));
     save();
     overlay.classList.remove('show');
     unlockNav();
