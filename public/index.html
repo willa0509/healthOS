@@ -1242,14 +1242,25 @@ CONVERSATION RULES:
 - After covering all 6 pillars, say EXACTLY: "I now have a clear picture of your health. Type 'analyse' when you're ready to see your results."
 - Track current pillar with: [PILLAR:sleep] [PILLAR:sunlight] [PILLAR:movement] [PILLAR:nutrition] [PILLAR:stress] [PILLAR:connection] [PILLAR:complete]
 
-START: Begin with sleep as the foundation. First message should feel like a knowledgeable coach opening a conversation — warm and direct.`;
+START: Your very first message must do three things:
+1. Introduce what's about to happen — tell them this is a health assessment that will identify their gaps and build a personalised habit plan. Keep it to 2-3 sentences max.
+2. Tell them it covers 6 areas of health and takes about 10-15 minutes.
+3. Ask the first sleep question to get started.
+
+CRITICAL: NEVER include [PILLAR:xxx] tags in the visible text of your message. Place them at the very end of your response on a new line, invisible to the user. The tag must always be the last thing in your response.
+
+Example format:
+"Your message here visible to user.
+
+[PILLAR:sleep]"`;
 
 // ══════════════════════════════════════════
 // CHAT INIT
 // ══════════════════════════════════════════
 async function initChat() {
-  const reply = await callAPI([{role:'user', content:'Start the health assessment. Ask your first question.'}]);
-  appendMsg('ai', reply);
+  const reply = await callAPI([{role:'user', content:'Start the health assessment with a brief welcome and your first question.'}]);
+  const clean = reply.replace(/\[PILLAR:[^\]]+\]/g,'').trim();
+  appendMsg('ai', clean);
   S.messages.push({role:'assistant', content: reply});
   save();
 }
@@ -1272,9 +1283,15 @@ function appendMsg(role, text, animate = true) {
   const div = document.createElement('div');
   div.className = `msg ${role}`;
   if (!animate) div.style.animation = 'none';
+  // Strip pillar tags, render **bold**, convert newlines
+  const clean = text
+    .replace(/\[PILLAR:[^\]]+\]/g, '')
+    .trim()
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
   div.innerHTML = `
     <div class="avatar">${role === 'ai' ? '⬡' : 'YOU'}</div>
-    <div class="bubble">${text.replace(/\n/g,'<br>')}</div>
+    <div class="bubble">${clean}</div>
   `;
   c.appendChild(div);
   c.scrollTop = c.scrollHeight;
