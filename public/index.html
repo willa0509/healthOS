@@ -588,6 +588,60 @@ body {
 .empty-title { font-family: var(--font-d); font-size: 30px; font-weight: 800; letter-spacing: 3px; color: var(--text2); margin-bottom: 10px; }
 .empty-body { font-size: 15px; color: var(--text3); line-height: 1.7; max-width: 300px; margin: 0 auto 24px; }
 
+/* Identity Writer */
+.id-writer {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+  padding: 28px; margin-bottom: 16px;
+}
+.id-writer-title {
+  font-family: var(--font-d); font-size: 26px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+}
+.id-writer-intro {
+  font-size: 15px; color: var(--text2); line-height: 1.75;
+  margin-bottom: 24px; font-weight: 300; font-style: italic;
+}
+.id-prompts { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+.id-prompt {
+  background: var(--bg2); border-radius: 6px; padding: 16px 18px;
+}
+.id-prompt-q {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  margin-bottom: 6px; letter-spacing: 0.2px;
+}
+.id-prompt-hint { font-size: 13px; color: var(--text3); line-height: 1.5; }
+.id-input-wrap {
+  background: var(--bg2); border-radius: 6px; padding: 18px 20px;
+  border: 1px solid var(--border2); margin-bottom: 12px;
+}
+.id-input-prefix {
+  font-size: 16px; font-weight: 600; color: var(--accent);
+  margin-bottom: 8px; display: block;
+}
+.id-textarea {
+  width: 100%; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: var(--font-b); font-size: 16px;
+  font-weight: 400; line-height: 1.6; resize: none; min-height: 60px;
+}
+.id-textarea::placeholder { color: var(--text3); font-style: italic; }
+.id-hint {
+  font-size: 12px; color: var(--text3); line-height: 1.55;
+}
+.id-save-btn {
+  width: 100%; justify-content: center; margin-top: 4px;
+}
+.id-saved {
+  display: none; background: var(--accent-dim); border: 1px solid var(--accent);
+  border-radius: 6px; padding: 14px 18px; margin-top: 12px;
+}
+.id-saved-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+}
+.id-saved-text { font-size: 16px; color: var(--text); font-style: italic; line-height: 1.6; }
+
 /* If Nothing Changes */
 .ync-box { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--amber); border-radius: 8px; padding: 28px; margin-bottom: 16px; }
 .ync-title { font-family: var(--font-d); font-size: 26px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); margin-bottom: 20px; }
@@ -1258,11 +1312,30 @@ function renderResults() {
     '</div>' +
 
     // Identity + Scores
-    (d.identityStatement ?
-      '<div class="id-card">' +
-        '<div class="id-card-label">Your Identity Statement</div>' +
-        '<div class="id-card-text">' + d.identityStatement + '</div>' +
-      '</div>' : '') +
+    '<div class="id-writer">' +
+      '<div class="id-writer-title">Your Identity Statement</div>' +
+      '<div class="id-writer-intro">The most powerful habit change starts with deciding who you are becoming, not what you are going to do. This statement is yours to write. An identity you choose for yourself is far more likely to stick than one someone hands you.</div>' +
+      '<div class="id-prompts">' +
+        '<div class="id-prompt">' +
+          '<div class="id-prompt-q">Who do you want to be in 12 months?</div>' +
+          '<div class="id-prompt-hint">Not what you want to have or achieve. Who you want to be. Think about how you move through the world, how you feel in your body, how you show up for the people around you.</div>' +
+        '</div>' +
+        '<div class="id-prompt">' +
+          '<div class="id-prompt-q">What does that person do every day that you currently do not?</div>' +
+          '<div class="id-prompt-hint">Think about your gaps. What small daily actions separate who you are now from who that person is.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="id-input-wrap">' +
+        '<span class="id-input-prefix">I am someone who...</span>' +
+        '<textarea class="id-textarea" id="id-input" placeholder="protects their sleep because they know what it costs them when they do not..." rows="2"></textarea>' +
+      '</div>' +
+      '<div class="id-hint">Keep it simple. One sentence. Present tense. Not "I want to be" but "I am." Write the identity of the person you are already becoming.</div>' +
+      '<button class="btn btn-green id-save-btn" id="btn-save-id" style="margin-top:16px;">SAVE MY IDENTITY STATEMENT</button>' +
+      '<div class="id-saved" id="id-saved">' +
+        '<div class="id-saved-label">Your Identity</div>' +
+        '<div class="id-saved-text" id="id-saved-text"></div>' +
+      '</div>' +
+    '</div>' +
 
     '<div class="card" style="margin-bottom:16px;">' +
       '<div class="card-lbl">Pillar Scores</div>' +
@@ -1332,6 +1405,38 @@ function renderResults() {
   on('btn-vp', function() { go('habits'); });
   on('btn-print-wall', function() { doPrint(); });
   on('btn-dl-sheet', function() { doSpreadsheet(); });
+
+  // Identity writer
+  on('btn-save-id', function() {
+    var inp = document.getElementById('id-input');
+    if (!inp) return;
+    var val = inp.value.trim();
+    if (!val) { inp.focus(); return; }
+    // Save to state
+    S.userIdentity = 'I am someone who ' + val;
+    save();
+    // Show saved confirmation
+    var saved = document.getElementById('id-saved');
+    var savedText = document.getElementById('id-saved-text');
+    if (saved && savedText) {
+      savedText.textContent = S.userIdentity;
+      saved.style.display = 'block';
+    }
+  });
+
+  // Restore saved identity if exists
+  if (S.userIdentity) {
+    var inp = document.getElementById('id-input');
+    var saved = document.getElementById('id-saved');
+    var savedText = document.getElementById('id-saved-text');
+    if (inp) {
+      inp.value = S.userIdentity.replace('I am someone who ', '');
+    }
+    if (saved && savedText) {
+      savedText.textContent = S.userIdentity;
+      saved.style.display = 'block';
+    }
+  }
 }
 
 function updateHabCounter() {
@@ -1404,7 +1509,7 @@ function renderHabits() {
   var comp = todayF.filter(function(h) { return S.log[today][h.id]; }).length;
   var tot = todayF.length;
   var pct = tot ? Math.round((comp/tot)*100) : 0;
-  var ident = S.analysis ? (S.analysis.identityStatement || '') : '';
+  var ident = S.userIdentity || (S.analysis ? (S.analysis.identityStatement || '') : '');
 
   var wrap = document.getElementById('hab-wrap');
   wrap.innerHTML =
@@ -1592,7 +1697,7 @@ function printSection() {
       '<div><div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#6b7280;margin-bottom:6px;">Built to Last</div><div style="font-size:36px;font-weight:700;">YOUR HEALTH PROTOCOL</div></div>' +
       '<div style="text-align:right;font-size:12px;color:#6b7280;">' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) + '<br>Score: ' + d.overallScore + '/10</div>' +
     '</div>' +
-    (d.identityStatement ? '<div style="background:#f9fafb;border-left:4px solid #111;padding:16px 20px;margin-bottom:28px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:8px;">Your Identity</div><div style="font-size:16px;font-style:italic;">' + d.identityStatement + '</div></div>' : '') +
+    ((S.userIdentity || d.identityStatement) ? '<div style="background:#f9fafb;border-left:4px solid #111;padding:16px 20px;margin-bottom:28px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:8px;">Your Identity</div><div style="font-size:16px;font-style:italic;">' + (S.userIdentity || d.identityStatement) + '</div></div>' : '') +
     '<div style="margin-bottom:28px;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:12px;">The Honest Picture</div><p style="font-size:14px;line-height:1.7;color:#374151;">' + (hp.whatIsHappening||'') + '</p></div>' +
     '<div style="margin-bottom:28px;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:12px;">Your Top Gaps</div>' +
     (d.gaps||[]).map(function(g) {
@@ -1644,7 +1749,7 @@ function doPrint() {
       '<div style="text-align:right;font-size:12px;color:#6b7280;">' + today + '<br>Score: ' + d.overallScore + '/10</div>' +
     '</div>' +
 
-    (d.identityStatement ? '<div style="background:#f9fafb;border-left:4px solid #111;padding:14px 18px;margin-bottom:24px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:6px;">Your Identity</div><div style="font-size:15px;font-style:italic;line-height:1.6;">' + d.identityStatement + '</div></div>' : '') +
+    ((S.userIdentity || d.identityStatement) ? '<div style="background:#f9fafb;border-left:4px solid #111;padding:14px 18px;margin-bottom:24px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:6px;">Your Identity</div><div style="font-size:15px;font-style:italic;line-height:1.6;">' + (S.userIdentity || d.identityStatement) + '</div></div>' : '') +
 
     '<div style="margin-bottom:24px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:10px;">The Honest Picture</div><p style="font-size:14px;line-height:1.7;color:#374151;">' + (hp.whatIsHappening||'') + '</p></div>' +
 
