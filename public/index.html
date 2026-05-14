@@ -1825,9 +1825,13 @@ function doPrint() {
   var cellW = Math.round(20 * zoom);
 
   var habList = S.habits.map(function(h, i) {
+    var instruction = h.cTitle || h.title || '';
+    var label = h.shortLabel || instruction;
+    var freq = h.cFreq || h.frequencyLabel || 'Every day';
     return '<div style="padding:' + Math.round(7*zoom) + 'px 0;border-bottom:1px solid #e5e7eb;">' +
-      '<div style="font-weight:700;font-size:' + Math.round(13*zoom) + 'px;margin-bottom:2px;">' + (i+1) + '. ' + (h.shortLabel||h.title) + '</div>' +
-      '<div style="font-size:' + Math.round(11*zoom) + 'px;color:#6b7280;">When: ' + (h.cAnchor||h.anchor||h.frequencyLabel||'Every day') + '</div>' +
+      '<div style="font-weight:700;font-size:' + Math.round(13*zoom) + 'px;margin-bottom:3px;">' + (i+1) + '. ' + label + '</div>' +
+      (instruction && instruction !== label ? '<div style="font-size:' + Math.round(11*zoom) + 'px;color:#374151;margin-bottom:2px;line-height:1.4;">' + instruction + '</div>' : '') +
+      '<div style="font-size:' + Math.round(10*zoom) + 'px;color:#9ca3af;">' + freq + '</div>' +
     '</div>';
   }).join('');
 
