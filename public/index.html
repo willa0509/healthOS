@@ -682,6 +682,13 @@ body {
 .hab-counter { text-align: center; padding: 14px; font-size: 14px; color: var(--text2); margin: 16px 0 8px; }
 .hab-counter strong { color: var(--accent); font-size: 18px; }
 
+/* Approach box */
+.approach-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; margin-bottom: 16px; }
+.approach-title { font-family: var(--font-d); font-size: 22px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--text); margin-bottom: 16px; }
+.approach-body { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+.approach-body strong { color: var(--text); font-weight: 600; }
+.approach-rule { margin-top: 16px; padding: 14px 16px; background: var(--bg2); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.6; }
+
 /* Print options */
 .print-opts-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; }
 .print-opts-title { font-family: var(--font-d); font-size: 26px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--text); margin-bottom: 8px; }
@@ -1360,25 +1367,49 @@ function renderResults() {
       '<button class="btn btn-green hab-opts-generate" id="btn-gen-plan" style="width:100%;justify-content:center;" disabled>GENERATE MY PLAN</button>' +
     '</div>' +
 
+    // How To Approach This
+    (function() {
+      var score = d.overallScore || 5;
+      var capacityMsg;
+      if (score >= 7) {
+        capacityMsg = 'Your overall score of ' + score + '/10 suggests solid foundations. You have reasonable capacity to build new habits — but start with one anyway. Two habits started right beats three started sloppy.';
+      } else if (score >= 5) {
+        capacityMsg = 'Your overall score of ' + score + '/10 suggests moderate capacity. Your system has gaps that are costing you energy. One habit at a time will get you further than three at once.';
+      } else {
+        capacityMsg = 'Your overall score of ' + score + '/10 suggests your system is under real strain. That is not a weakness — it is information. Start with just one habit and protect it fiercely. Trying to fix everything at once is how nothing gets fixed.';
+      }
+      var firstGap = (d.gaps && d.gaps[0]) ? d.gaps[0] : null;
+      var firstOpt = (d.habitOptions && d.habitOptions[0] && d.habitOptions[0].options && d.habitOptions[0].options[0]) ? d.habitOptions[0].options[0] : null;
+      var startMsg = (firstGap && firstOpt)
+        ? 'Start with <strong>' + firstOpt.label + '</strong>. It addresses your top gap — ' + firstGap.title.toLowerCase() + ' — which has the highest leverage on everything else in your results.'
+        : 'Start with the first habit in your list. It addresses your most critical gap and has the highest leverage on your other scores.';
+      return '<div class="approach-box">' +
+        '<div class="approach-title">How To Approach This</div>' +
+        '<div class="approach-body">' + capacityMsg + '</div>' +
+        '<div class="approach-body">' + startMsg + '</div>' +
+        '<div class="approach-rule">When it feels automatic — usually 2 to 4 weeks — add the next one. Never add a new habit while an existing one still feels like effort.</div>' +
+      '</div>';
+    })() +
+
     // Print options
     '<div class="print-opts-box">' +
       '<div class="print-opts-title">Your Protocol</div>' +
-      '<div class="print-opts-body">Once you have selected your habits and generated your plan, choose how you want to track them. Read both options before deciding.</div>' +
+      '<div class="print-opts-body">Once you have generated your plan, print it. Two things to put on your wall — your statement and your tracker.</div>' +
       '<div class="print-opt-cards">' +
         '<div class="print-opt-card primary">' +
           '<div class="print-opt-icon">&#128196;</div>' +
-          '<div class="print-opt-name">Print and Put It On The Wall</div>' +
-          '<div class="print-opt-desc">Print your habit tracker and stick it somewhere you cannot ignore it. Your desk. Your bathroom mirror. Your fridge. Somewhere that is in your way every single day.</div>' +
+          '<div class="print-opt-name">Wall Statement</div>' +
+          '<div class="print-opt-desc">Your protocol summary — identity, honest picture, habits, and rules. Portrait. One page. Stick it somewhere you see it every single day.</div>' +
         '</div>' +
-        '<div class="print-opt-card">' +
-          '<div class="print-opt-icon">&#128200;</div>' +
-          '<div class="print-opt-name">Digital Spreadsheet</div>' +
-          '<div class="print-opt-desc">A simple spreadsheet version you can update daily on your phone or computer.</div>' +
-          '<div class="print-opt-caveat">Only choose this if you have a proven track record of being consistent with digital documents. If you are unsure, choose the wall version. Most people overestimate how often they will open a spreadsheet.</div>' +
+        '<div class="print-opt-card primary">' +
+          '<div class="print-opt-icon">&#9989;</div>' +
+          '<div class="print-opt-name">8-Week Habit Tracker</div>' +
+          '<div class="print-opt-desc">Two landscape sheets — Weeks 1 to 4 and Weeks 5 to 8. Tick each day. Week 8 includes a prompt to retake your assessment.</div>' +
         '</div>' +
       '</div>' +
       '<div id="print-actions" style="display:none;">' +
-        '<button class="btn btn-green" id="btn-print-wall" style="margin-right:10px;margin-bottom:10px;">PRINT WALL PLAN</button>' +
+        '<button class="btn btn-green" id="btn-print-wall" style="margin-right:10px;margin-bottom:10px;">PRINT WALL STATEMENT</button>' +
+        '<button class="btn btn-green" id="btn-print-tracker" style="margin-right:10px;margin-bottom:10px;">PRINT HABIT TRACKER</button>' +
         '<button class="btn btn-outline" id="btn-dl-sheet">DOWNLOAD SPREADSHEET</button>' +
       '</div>' +
     '</div>';
@@ -1406,6 +1437,7 @@ function renderResults() {
   on('btn-gen-plan', function() { generatePlan(); });
   on('btn-vp', function() { go('habits'); });
   on('btn-print-wall', function() { doPrint(); });
+  on('btn-print-tracker', function() { doTracker(); });
   on('btn-dl-sheet', function() { doSpreadsheet(); });
 
   // Identity writer
@@ -1562,8 +1594,9 @@ function renderHabits() {
     on('tab-' + t, function() { switchTab(t); });
   });
 
-  // Wire print button
+  // Wire print buttons
   on('btn-doprint', function() { doPrint(); });
+  on('btn-dotracker', function() { doTracker(); });
 }
 
 function tierSection(tier, today, full) {
@@ -1714,8 +1747,9 @@ function printSection() {
 
   return '<div class="print-box">' +
     '<div class="print-title">Print Your Protocol</div>' +
-    '<div class="print-body">Print this and put it somewhere you will see every single day. On the wall. On the mirror. Not in a notes app. On the wall.</div>' +
-    '<button class="btn btn-green" id="btn-doprint">PRINT MY PLAN</button>' +
+    '<div class="print-body">Two things to put on your wall. Print both and put them somewhere you cannot ignore.</div>' +
+    '<button class="btn btn-green" id="btn-doprint" style="margin-right:10px;margin-bottom:10px;">PRINT WALL STATEMENT</button>' +
+    '<button class="btn btn-green" id="btn-dotracker" style="margin-bottom:10px;">PRINT HABIT TRACKER</button>' +
   '</div>' +
   '<div id="pa4-content" style="display:none;">' + a4 + '</div>';
 }
@@ -1736,15 +1770,6 @@ function doPrint() {
     '</tr>';
   }).join('');
 
-  // Build 30-day tracker grid
-  var days = ['M','T','W','T','F','S','S'];
-  var trackerRows = S.habits.map(function(h) {
-    var cells = Array.from({length:30}, function(_,i) {
-      return '<td style="width:28px;height:28px;border:1px solid #e5e7eb;text-align:center;"></td>';
-    }).join('');
-    return '<tr><td style="padding:6px 10px;font-weight:500;font-size:13px;white-space:nowrap;border-right:2px solid #e5e7eb;">' + (h.shortLabel||h.title.substring(0,20)) + '</td>' + cells + '</tr>';
-  }).join('');
-
   var a4html = '<div style="font-family:Georgia,serif;max-width:820px;margin:0 auto;padding:40px;background:white;color:#111;">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:3px solid #111;">' +
       '<div><div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#6b7280;margin-bottom:6px;">Built to Last</div><div style="font-size:32px;font-weight:700;letter-spacing:1px;">YOUR HEALTH PROTOCOL</div></div>' +
@@ -1761,10 +1786,6 @@ function doPrint() {
     '<div style="margin-bottom:24px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:6px;">The Rules</div>' +
     '<div style="font-size:14px;line-height:1.9;color:#374151;">1. Start with 1 habit. Add the next only when the first feels automatic.<br>2. Never miss two days in a row. One miss is human. Two is a new pattern forming.<br>3. Pick habits you can do on your worst day, not your best.<br>4. This plan is built for your gaps. Trust the order.</div></div>' +
 
-    '<div style="margin-bottom:24px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:10px;">30-Day Tracker</div>' +
-    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">Tick each day you complete the habit.</div>' +
-    '<table style="border-collapse:collapse;width:100%;">' + trackerRows + '</table></div>' +
-
     '<div style="margin-bottom:20px;"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6b7280;margin-bottom:8px;">What Becomes Possible</div><p style="font-size:14px;line-height:1.7;color:#374151;font-style:italic;">' + (hp.whatChanges||'') + '</p></div>' +
 
     '<div style="margin-top:28px;padding-top:16px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;"><div style="font-size:11px;color:#9ca3af;">Built to Last</div><div style="font-size:11px;color:#9ca3af;">health-os-xi.vercel.app</div></div>' +
@@ -1775,6 +1796,83 @@ function doPrint() {
   printWin.document.close();
   printWin.focus();
   setTimeout(function() { printWin.print(); }, 500);
+}
+
+function doTracker() {
+  if (!S.habits || !S.habits.length) {
+    alert('Please select your habits first.');
+    return;
+  }
+  var days = ['M','T','W','T','F','S','S'];
+  var d = S.analysis || {};
+
+  function makeSheet(startWeek, endWeek, isLast) {
+    var weekHeaders = '';
+    for (var w = startWeek; w <= endWeek; w++) {
+      var isGreen = (w === 8);
+      weekHeaders += '<th colspan="7" style="padding:6px 4px;text-align:center;font-size:10px;letter-spacing:2px;text-transform:uppercase;' +
+        (isGreen ? 'background:#d1fae5;color:#065f46;' : 'background:#f9fafb;color:#6b7280;') +
+        'border:1px solid #e5e7eb;font-weight:600;">WEEK ' + w + (isGreen ? ' &#9733;' : '') + '</th>';
+    }
+
+    var dayHeaders = '<td style="min-width:110px;"></td>';
+    for (var w = startWeek; w <= endWeek; w++) {
+      days.forEach(function(day) {
+        dayHeaders += '<th style="width:26px;padding:4px 2px;text-align:center;font-size:9px;color:#9ca3af;border:1px solid #e5e7eb;">' + day + '</th>';
+      });
+    }
+
+    var rows = S.habits.map(function(h) {
+      var cells = '';
+      for (var w = startWeek; w <= endWeek; w++) {
+        for (var i = 0; i < 7; i++) {
+          cells += '<td style="width:26px;height:26px;border:1px solid #e5e7eb;"></td>';
+        }
+      }
+      return '<tr><td style="padding:6px 10px;font-size:13px;font-weight:500;white-space:nowrap;border-right:2px solid #e5e7eb;border-bottom:1px solid #f3f4f6;">' +
+        (h.shortLabel || h.title.substring(0, 22)) + '</td>' + cells + '</tr>';
+    }).join('');
+
+    var retake = isLast
+      ? '<div style="margin-top:24px;padding:14px 18px;background:#d1fae5;border-left:4px solid #059669;border-radius:0 6px 6px 0;">' +
+          '<div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#065f46;margin-bottom:4px;">Week 8 Complete</div>' +
+          '<div style="font-size:13px;color:#065f46;">You made it to 8 weeks. Time to retake your assessment and see how far you have come. &rarr; health-os-xi.vercel.app</div>' +
+        '</div>'
+      : '';
+
+    return '<div style="' + (isLast ? '' : 'page-break-after:always;') + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;padding-bottom:12px;border-bottom:3px solid #111;">' +
+        '<div>' +
+          '<div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">Built to Last</div>' +
+          '<div style="font-size:22px;font-weight:700;letter-spacing:1px;">HABIT TRACKER &mdash; WEEKS ' + startWeek + ' TO ' + endWeek + '</div>' +
+        '</div>' +
+        '<div style="text-align:right;font-size:11px;color:#6b7280;">Score: ' + (d.overallScore||'?') + '/10<br>health-os-xi.vercel.app</div>' +
+      '</div>' +
+      '<table style="border-collapse:collapse;width:100%;">' +
+        '<thead>' +
+          '<tr><td style="min-width:110px;"></td>' + weekHeaders + '</tr>' +
+          '<tr>' + dayHeaders + '</tr>' +
+        '</thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>' +
+      retake +
+    '</div>';
+  }
+
+  var html = '<!DOCTYPE html><html><head><title>Built to Last - Habit Tracker</title>' +
+    '<style>' +
+    '@page { size: A4 landscape; margin: 12mm; }' +
+    'body { font-family: Georgia, serif; margin: 0; background: white; color: #111; }' +
+    '</style></head><body>' +
+    makeSheet(1, 4, false) +
+    makeSheet(5, 8, true) +
+    '</body></html>';
+
+  var win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); }, 500);
 }
 
 function doSpreadsheet() {
