@@ -682,6 +682,19 @@ body {
 .hab-counter { text-align: center; padding: 14px; font-size: 14px; color: var(--text2); margin: 16px 0 8px; }
 .hab-counter strong { color: var(--accent); font-size: 18px; }
 
+/* Roadmap */
+.roadmap-intro { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; font-weight: 300; padding: 14px 16px; background: var(--bg2); border-radius: 6px; }
+.roadmap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 12px; }
+.roadmap-gap-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.roadmap-gap-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.roadmap-gap-reason { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; }
+.roadmap-habit { font-size: 13px; color: var(--text2); padding-top: 10px; border-top: 1px solid var(--border); }
+.roadmap-habit strong { color: var(--accent); }
+.retake-zone { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; }
+.retake-note { font-size: 12px; color: var(--text3); line-height: 1.6; margin-bottom: 12px; }
+.retake-btn { background: none; border: 1px solid var(--border); color: var(--text3); font-size: 12px; padding: 8px 16px; border-radius: 4px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
+.retake-btn:hover { border-color: var(--text3); color: var(--text); }
+
 /* Approach box */
 .approach-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; margin-bottom: 16px; }
 .approach-title { font-family: var(--font-d); font-size: 22px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--text); margin-bottom: 16px; }
@@ -1548,7 +1561,7 @@ function renderHabits() {
 
     '<div class="tabs">' +
       '<button class="tab on" id="tab-today">Today</button>' +
-      '<button class="tab" id="tab-plan">Full Plan</button>' +
+      '<button class="tab" id="tab-plan">What\'s Next</button>' +
       '<button class="tab" id="tab-print">Print</button>' +
     '</div>' +
 
@@ -1563,13 +1576,14 @@ function renderHabits() {
       tierSection('foundation', today) +
     '</div>' +
 
-    '<div class="tv" id="tv-plan">' +
-      tierSection('foundation', today, true) +
-      tierSection('build', today, true) +
-      tierSection('optimise', today, true) +
-    '</div>' +
+    '<div class="tv" id="tv-plan">' + roadmapSection() + '</div>' +
 
-    '<div class="tv" id="tv-print">' + printSection() + '</div>';
+    '<div class="tv" id="tv-print">' + printSection() + '</div>' +
+
+    '<div class="retake-zone">' +
+      '<div class="retake-note">Your results are saved in this browser only. They will not appear on other devices and will be lost if you clear your browser data.<br>Ready to measure your progress? You can retake the assessment at any time.</div>' +
+      '<button class="retake-btn" id="btn-retake">RETAKE ASSESSMENT</button>' +
+    '</div>';
 
   // Wire tabs
   ['today','plan','print'].forEach(function(t) {
@@ -1579,6 +1593,45 @@ function renderHabits() {
   // Wire print buttons
   on('btn-doprint', function() { doPrint(); });
   on('btn-dotracker', function() { doTracker(); });
+
+  // Wire retake
+  on('btn-retake', function() {
+    if (confirm('This will delete your current results and start the assessment again. This cannot be undone. Are you sure?')) {
+      localStorage.removeItem('btlhos');
+      location.reload();
+    }
+  });
+}
+
+function roadmapSection() {
+  var d = S.analysis;
+  if (!d) return '';
+
+  var activePillars = (S.habits || []).map(function(h) { return h.pillar; });
+  var futureGaps = (d.habitOptions || []).filter(function(gap) {
+    return activePillars.indexOf(gap.pillar) === -1;
+  });
+
+  var cards = futureGaps.map(function(gap) {
+    var gapInfo = (d.gaps || []).find(function(g) { return g.rank === gap.gapRank; }) || {};
+    var topOpt = gap.options && gap.options[0];
+    return '<div class="roadmap-card">' +
+      '<div class="roadmap-gap-label">Gap ' + gap.gapRank + ' &nbsp;&middot;&nbsp; ' + gap.pillar + '</div>' +
+      '<div class="roadmap-gap-title">' + gap.gapTitle + '</div>' +
+      '<div class="roadmap-gap-reason">' + (gapInfo.reason || '') + '</div>' +
+      (topOpt ? '<div class="roadmap-habit">When ready &rarr; <strong>' + topOpt.label + '</strong><br><span style="font-size:12px;color:var(--text3);">' + topOpt.description + '</span></div>' : '') +
+    '</div>';
+  }).join('');
+
+  var empty = !futureGaps.length
+    ? '<div class="roadmap-intro">You are addressing all identified gaps. When your habits feel automatic, retake the assessment to find your next frontier.</div>'
+    : '';
+
+  return '<div class="page-ey" style="margin-bottom:4px;">Your Roadmap</div>' +
+    '<div class="page-title" style="margin-bottom:20px;">WHAT\'S <span class="green">NEXT.</span></div>' +
+    (futureGaps.length
+      ? '<div class="roadmap-intro">These gaps were identified in your assessment but you are not working on them yet. Come back to this list when your current habits feel automatic — usually 8 to 12 weeks in. Do not rush it.</div>' + cards
+      : empty);
 }
 
 function tierSection(tier, today, full) {
