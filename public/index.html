@@ -682,6 +682,15 @@ body {
 .hab-counter { text-align: center; padding: 14px; font-size: 14px; color: var(--text2); margin: 16px 0 8px; }
 .hab-counter strong { color: var(--accent); font-size: 18px; }
 
+/* Execution steps */
+.exec-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; margin-bottom: 16px; }
+.exec-title { font-family: var(--font-d); font-size: 22px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--text); margin-bottom: 20px; }
+.exec-step { display: flex; gap: 16px; margin-bottom: 20px; }
+.exec-n { font-family: var(--font-d); font-size: 32px; font-weight: 800; color: var(--accent); line-height: 1; flex-shrink: 0; width: 28px; }
+.exec-body { flex: 1; }
+.exec-step-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.exec-step-body { font-size: 14px; font-weight: 300; color: var(--text2); line-height: 1.7; }
+
 /* Roadmap */
 .roadmap-intro { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; font-weight: 300; padding: 14px 16px; background: var(--bg2); border-radius: 6px; }
 .roadmap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 12px; }
@@ -1548,51 +1557,59 @@ function renderHabits() {
     '<div class="page-ey">Your Protocol</div>' +
     '<div class="page-title">YOUR <span class="green">PLAN.</span></div>' +
 
-    (ident ?
-      '<div class="id-section">' +
-        '<div class="id-sec-label">Your Identity</div>' +
-        '<div class="id-statement">' + ident + '</div>' +
-        '<div class="id-rules">' +
-          '<div class="id-rule"><div class="id-rule-n">1</div><div>Start with foundation habits only. Do not add more until these are automatic.</div></div>' +
-          '<div class="id-rule"><div class="id-rule-n">2</div><div>If you miss a day, never miss two in a row. That is the only rule that matters.</div></div>' +
-          '<div class="id-rule"><div class="id-rule-n">3</div><div>Print this plan and put it somewhere you will see it every single day.</div></div>' +
+    // Execution steps
+    '<div class="exec-box">' +
+      '<div class="exec-title">How To Execute This</div>' +
+      '<div class="exec-step">' +
+        '<div class="exec-n">1</div>' +
+        '<div class="exec-body">' +
+          '<div class="exec-step-title">Print your protocol and put it on the wall today</div>' +
+          '<div class="exec-step-body">Not later. Now. Research on implementation intentions shows that deciding exactly when and where you will act more than doubles follow-through. The protocol only works if it is visible every single day.</div>' +
         '</div>' +
-      '</div>' : '') +
-
-    '<div class="tabs">' +
-      '<button class="tab on" id="tab-today">Today</button>' +
-      '<button class="tab" id="tab-plan">What\'s Next</button>' +
-      '<button class="tab" id="tab-print">Print</button>' +
-    '</div>' +
-
-    '<div class="tv on" id="tv-today">' +
-      '<div class="day-label">' + new Date().toLocaleDateString('en-GB',{weekday:'long'}).toUpperCase() + '</div>' +
-      '<div class="day-sub">' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) + '</div>' +
-      '<div class="prog-row">' +
-        '<div class="prog-lbl">Foundation</div>' +
-        '<div class="prog-track"><div class="prog-fill" style="width:' + pct + '%"></div></div>' +
-        '<div class="prog-val">' + comp + '/' + tot + '</div>' +
       '</div>' +
-      tierSection('foundation', today) +
+      '<div class="exec-step">' +
+        '<div class="exec-n">2</div>' +
+        '<div class="exec-body">' +
+          '<div class="exec-step-title">Anchor each habit to something you already do</div>' +
+          '<div class="exec-step-body">Habit stacking — attaching a new behaviour to an existing one — is one of the most reliable behaviour change techniques. After I wake up, I get morning light. After I finish work, I walk. Same cue, same time, every day.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="exec-step">' +
+        '<div class="exec-n">3</div>' +
+        '<div class="exec-body">' +
+          '<div class="exec-step-title">Make it impossible to miss the cue</div>' +
+          '<div class="exec-step-body">Environment design is more powerful than willpower. Put your running shoes by the door. Set a phone alarm with the habit name. Make the right choice the obvious one before motivation is even required.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="exec-step">' +
+        '<div class="exec-n">4</div>' +
+        '<div class="exec-body">' +
+          '<div class="exec-step-title">Tick the box every day — that is the whole game</div>' +
+          '<div class="exec-step-body">The streak is the mechanism. Visual tracking on paper (not an app) has been shown to increase habit adherence significantly because it creates a physical record you do not want to break. One tick at a time.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="exec-step">' +
+        '<div class="exec-n">5</div>' +
+        '<div class="exec-body">' +
+          '<div class="exec-step-title">Never miss twice</div>' +
+          '<div class="exec-step-body">Missing one day does not break a habit. Missing two in a row begins forming a new one — the habit of not doing it. One miss is human. Two is a pattern. That is the only rule that matters more than any other.</div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-green" id="btn-doprint" style="width:100%;justify-content:center;margin-top:8px;">PRINT YOUR PROTOCOL</button>' +
     '</div>' +
 
-    '<div class="tv" id="tv-plan">' + roadmapSection() + '</div>' +
+    // What\'s Next
+    roadmapSection() +
 
-    '<div class="tv" id="tv-print">' + printSection() + '</div>' +
-
+    // Retake
     '<div class="retake-zone">' +
-      '<div class="retake-note">Your results are saved in this browser only. They will not appear on other devices and will be lost if you clear your browser data.<br>Ready to measure your progress? You can retake the assessment at any time.</div>' +
+      '<div class="exec-title" style="margin-bottom:12px;">When To Reassess</div>' +
+      '<div class="retake-note" style="margin-bottom:16px;font-size:14px;color:var(--text2);line-height:1.7;">Research by Phillippa Lally at UCL found most simple habits take a median of 66 days to feel automatic — roughly 9 to 10 weeks. Come back at <strong>8 weeks minimum</strong> for a check-in. If your habits still feel like effort, wait another 4 weeks before adding more. A proper full reassessment makes sense at <strong>12 weeks</strong>.<br><br>Your results are saved in this browser only — they will not appear on other devices and will be lost if you clear your browser data.</div>' +
       '<button class="retake-btn" id="btn-retake">RETAKE ASSESSMENT</button>' +
     '</div>';
 
-  // Wire tabs
-  ['today','plan','print'].forEach(function(t) {
-    on('tab-' + t, function() { switchTab(t); });
-  });
-
-  // Wire print buttons
+  // Wire print button
   on('btn-doprint', function() { doPrint(); });
-  on('btn-dotracker', function() { doTracker(); });
 
   // Wire retake
   on('btn-retake', function() {
