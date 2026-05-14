@@ -1561,7 +1561,6 @@ function renderHabits() {
 
     '<div class="tabs">' +
       '<button class="tab on" id="tab-today">Today</button>' +
-      '<button class="tab" id="tab-week">This Week</button>' +
       '<button class="tab" id="tab-plan">Full Plan</button>' +
       '<button class="tab" id="tab-print">Print</button>' +
     '</div>' +
@@ -1577,8 +1576,6 @@ function renderHabits() {
       tierSection('foundation', today) +
     '</div>' +
 
-    '<div class="tv" id="tv-week">' + weekGrid() + '</div>' +
-
     '<div class="tv" id="tv-plan">' +
       tierSection('foundation', today, true) +
       tierSection('build', today, true) +
@@ -1588,7 +1585,7 @@ function renderHabits() {
     '<div class="tv" id="tv-print">' + printSection() + '</div>';
 
   // Wire tabs
-  ['today','week','plan','print'].forEach(function(t) {
+  ['today','plan','print'].forEach(function(t) {
     on('tab-' + t, function() { switchTab(t); });
   });
 
@@ -1745,7 +1742,7 @@ function printSection() {
 
   return '<div class="print-box">' +
     '<div class="print-title">Print Your Protocol</div>' +
-    '<div class="print-body">Two things to put on your wall. Print both and put them somewhere you cannot ignore.</div>' +
+    '<div class="print-body">Tracking on your phone does not work. Research consistently shows that physical, visible tracking outperforms digital because it creates an environmental cue you cannot scroll past. Put these on a wall you walk past every single day — your bedroom door, your bathroom mirror, your desk. Somewhere that makes skipping feel deliberate.</div>' +
     '<button class="btn btn-green" id="btn-doprint" style="margin-right:10px;margin-bottom:10px;">PRINT WALL STATEMENT</button>' +
     '<button class="btn btn-green" id="btn-dotracker" style="margin-bottom:10px;">PRINT HABIT TRACKER</button>' +
   '</div>' +
