@@ -755,7 +755,7 @@ body {
   <div class="loader-title">ANALYSING</div>
   <div class="loader-steps">
     <div class="lstep on" id="ls1"><div class="lstep-dot"></div>Mapping your health picture</div>
-    <div class="lstep" id="ls2"><div class="lstep-dot"></div>Applying priority hierarchy</div>
+    <div class="lstep" id="ls2"><div class="lstep-dot"></div>Mapping your whole health picture</div>
     <div class="lstep" id="ls3"><div class="lstep-dot"></div>Identifying your key gaps</div>
     <div class="lstep" id="ls4"><div class="lstep-dot"></div>Building your habit stack</div>
   </div>
@@ -834,12 +834,8 @@ body {
         <div class="pillar-row" id="pnav-connection"><div class="p-dot"></div><div class="p-name">Connection</div><div class="p-tick"></div></div>
       </div>
       <div class="pyr-box">
-        <div class="pyr-label">Priority Hierarchy</div>
-        <div class="pyr-row"><div class="pyr-n">1</div><span>Behaviour and Adherence</span></div>
-        <div class="pyr-row"><div class="pyr-n">2</div><span>Energy Balance</span></div>
-        <div class="pyr-row"><div class="pyr-n">3</div><span>Macronutrients</span></div>
-        <div class="pyr-row"><div class="pyr-n">4</div><span>Nutrient Timing</span></div>
-        <div class="pyr-row"><div class="pyr-n">5</div><span>Supplements</span></div>
+        <div class="pyr-label">Holistic Health</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.7;padding:2px 0;">This assessment maps your whole health picture — not just one area. Every pillar affects every other. The gaps that are actually holding you back are not always the ones you expect.</div>
       </div>
     </div>
     <div class="chat-wrap">
@@ -923,8 +919,16 @@ function injectLogos() {
 }
 
 // ═══════════════════════════════════════════
-// PILLAR COLOURS
+// PILLAR COLOURS + AUTHOR MAP
 // ═══════════════════════════════════════════
+var PILLAR_AUTHOR = {
+  sleep:      { name: 'Matthew Walker',                    why: 'Walker\'s research shows sleep is the master variable — it governs cognitive function, metabolic health, emotional regulation and physical recovery simultaneously.' },
+  sunlight:   { name: 'Andrew Huberman',                   why: 'Huberman\'s work shows morning light exposure sets your circadian clock, governs cortisol timing and directly impacts sleep quality, mood and alertness throughout the day.' },
+  movement:   { name: 'Andrew Huberman & Rhonda Patrick',  why: 'Both researchers identify consistent movement as one of the highest-leverage health behaviours — improving brain health, metabolic function, mood and longevity markers.' },
+  nutrition:  { name: 'Rhonda Patrick',                    why: 'Patrick\'s research links micronutrient status and dietary quality to energy, cognitive performance, inflammation and long-term disease risk — nutrition is foundational, not cosmetic.' },
+  stress:     { name: 'Gabor Maté',                        why: 'Maté\'s work positions chronic stress as a root cause — not just a symptom. Unmanaged stress sits upstream of immune dysfunction, hormonal disruption and most chronic health breakdown.' },
+  connection: { name: 'Dan Buettner',                      why: 'Buettner\'s Blue Zones research consistently identifies social connection as one of the strongest predictors of longevity — more powerful than most physical health interventions.' }
+};
 var PC = {
   sleep: '#6366f1', sunlight: '#fbbf24', movement: '#f87171',
   nutrition: '#6effa0', stress: '#c084fc', connection: '#38bdf8'
@@ -1343,9 +1347,12 @@ function renderResults() {
         '<div class="hab-select-tick">&#10003;</div>' +
       '</div>';
     }).join('');
+    var pa = PILLAR_AUTHOR[gap.pillar] || {};
     return '<div class="hab-gap-section">' +
       '<div class="hab-gap-label">Gap ' + gap.gapRank + ' &nbsp;&middot;&nbsp; ' + gap.pillar + '</div>' +
       '<div class="hab-gap-title">' + gap.gapTitle + '</div>' +
+      (pa.name ? '<div style="font-size:12px;color:var(--accent);font-weight:500;margin:-4px 0 6px;">Research: ' + pa.name + '</div>' : '') +
+      (pa.why  ? '<div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:10px;font-style:italic;">' + pa.why + '</div>' : '') +
       opts +
     '</div>';
   }).join('');
@@ -1434,7 +1441,7 @@ function renderResults() {
     // Habit options
     '<div class="hab-opts-box">' +
       '<div class="hab-opts-title">Choose Your Habits</div>' +
-      '<div class="hab-opts-intro">Here are habit options for each of your gaps, ranked by impact. Research suggests 1 to 3 habits gives the best chance of success — most people overestimate what they will stick to. That said, you know yourself. If you want to take on more, select as many as you are genuinely confident you will stick to.</div>' +
+      '<div class="hab-opts-intro">Here are habit options for each of your gaps, ranked by impact. James Clear and BJ Fogg both find that 1 to 3 habits gives the best chance of success — most people dramatically overestimate what they will actually stick to. Select the options you are genuinely confident you can sustain on your worst day, not just your best.</div>' +
       '<div class="hab-opts-warning">' +
         '<strong>Before you choose, be honest with yourself.</strong> Pick habits you can genuinely imagine doing on your worst day, not your best. Temporary motivation fades. The right habit is not the most impressive one. It is the one you will still be doing in six months when life gets busy, you are tired, and you do not feel like it. If you look at an option and think "I could do that when I am feeling good" — skip it. If you look at one and think "I could do that even on a bad day" — that is your habit.' +
       '</div>' +
@@ -1470,9 +1477,11 @@ function renderResults() {
     // Print options
     '<div class="print-opts-box">' +
       '<div class="print-opts-title">Your Protocol</div>' +
-      '<div class="print-opts-body">Once you have generated your plan, print it and put it somewhere you cannot ignore.</div>' +
-      '<div id="print-actions" style="display:none;">' +
-        '<button class="btn btn-green" id="btn-print-wall">PRINT YOUR PROTOCOL</button>' +
+      '<div class="print-opts-body">Select your habits above then generate your plan. Once ready, preview it full-size or print it directly — then head to My Plan to start tracking.</div>' +
+      '<div id="print-actions" style="display:none;display:flex;flex-direction:column;gap:10px;margin-top:16px;">' +
+        '<button class="btn btn-outline" id="btn-preview-wall" style="width:100%;justify-content:center;">PREVIEW MY PROTOCOL</button>' +
+        '<button class="btn btn-outline" id="btn-print-wall" style="width:100%;justify-content:center;">PRINT PROTOCOL</button>' +
+        '<button class="btn btn-green" id="btn-vp" style="width:100%;justify-content:center;margin-top:4px;">GO TO MY PLAN &rarr;</button>' +
       '</div>' +
     '</div>';
 
@@ -1498,6 +1507,7 @@ function renderResults() {
 
   on('btn-gen-plan', function() { generatePlan(); });
   on('btn-vp', function() { go('habits'); });
+  on('btn-preview-wall', function() { previewProtocol(); });
   on('btn-print-wall', function() { doPrint(); });
   on('btn-print-tracker', function() { doTracker(); });
   on('btn-dl-sheet', function() { doSpreadsheet(); });
@@ -1582,14 +1592,13 @@ function generatePlan() {
 
   // Show print actions
   var pa = document.getElementById('print-actions');
-  if (pa) pa.style.display = 'block';
+  if (pa) pa.style.display = 'flex';
 
   // Scroll to print section
   var po = document.querySelector('.print-opts-box');
   if (po) po.scrollIntoView({ behavior: 'smooth' });
 
   unlockNav();
-  alert('Your plan is ready. Scroll down to print it or go to My Plan to track your habits.');
 }
 
 // ═══════════════════════════════════════════
@@ -1619,28 +1628,28 @@ function renderHabits() {
         '<div class="exec-n">1</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Print your protocol and put it on the wall today</div>' +
-          '<div class="exec-step-body">Not later. Now. Research on implementation intentions shows that deciding exactly when and where you will act more than doubles follow-through. The protocol only works if it is visible every single day.</div>' +
+          '<div class="exec-step-body">Not later. Now. James Clear documents this consistently — deciding in advance exactly when and where you will perform a behaviour more than doubles follow-through. An environmental cue you cannot scroll past beats willpower every time.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
         '<div class="exec-n">2</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Anchor each habit to something you already do</div>' +
-          '<div class="exec-step-body">Habit stacking — attaching a new behaviour to an existing one — is one of the most reliable behaviour change techniques. After I wake up, I get morning light. After I finish work, I walk. Same cue, same time, every day.</div>' +
+          '<div class="exec-step-body">BJ Fogg calls this anchoring — attaching a new behaviour to an existing one so it inherits the cue automatically. James Clear calls it habit stacking. Both researchers identify it as one of the most reliable behaviour change techniques available. After I wake up, I get morning light. After I finish work, I walk.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
         '<div class="exec-n">3</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Make it impossible to miss the cue</div>' +
-          '<div class="exec-step-body">Environment design is more powerful than willpower. Put your running shoes by the door. Set a phone alarm with the habit name. Make the right choice the obvious one before motivation is even required.</div>' +
+          '<div class="exec-step-body">James Clear\'s work on environment design is clear: your surroundings shape your behaviour more than your intentions do. Put your running shoes by the door. Set a phone alarm labelled with the habit. Make the right choice the obvious one before motivation is even required — because motivation will not always be there.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
         '<div class="exec-n">4</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Tick the box every day — that is the whole game</div>' +
-          '<div class="exec-step-body">The streak is the mechanism. Visual tracking on paper (not an app) has been shown to increase habit adherence significantly because it creates a physical record you do not want to break. One tick at a time.</div>' +
+          '<div class="exec-step-body">James Clear calls it "never miss twice" — missing once is human, missing twice starts forming a new habit: the habit of not showing up. BJ Fogg adds that celebrating small completions, even briefly, reinforces the behaviour neurologically. One tick at a time. That is the whole mechanism.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
@@ -1875,7 +1884,22 @@ function printSection() {
   '<div id="pa4-content" style="display:none;">' + a4 + '</div>';
 }
 
+function previewProtocol() {
+  if (!S.analysis || !S.habits || !S.habits.length) {
+    alert('Please select your habits first.');
+    return;
+  }
+  // Build the same A4 document as doPrint but open without triggering print
+  // Temporarily intercept: call doPrint logic minus the window.print() call
+  var _origPrint = window.print;
+  // Open the print window without printing
+  doPrint._preview = true;
+  doPrint();
+  doPrint._preview = false;
+}
+
 function doPrint() {
+  var isPreview = doPrint._preview;
   if (!S.analysis || !S.habits || !S.habits.length) {
     alert('Please select your habits first.');
     return;
@@ -1990,7 +2014,7 @@ function doPrint() {
   printWin.document.write(a4html);
   printWin.document.close();
   printWin.focus();
-  setTimeout(function() { printWin.print(); }, 500);
+  if (!isPreview) setTimeout(function() { printWin.print(); }, 500);
 }
 
 function doTracker() {
