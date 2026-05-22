@@ -1051,12 +1051,9 @@ var AP = [
   '{"pillarScores":{"sleep":7,"sunlight":5,"movement":6,"nutrition":6,"stress":4,"connection":7},',
   '"overallScore":6,',
   '"honestPicture":{',
-  '"whatIsHappening":"2 sentences. Direct and factual. No sugarcoating. What pattern is showing up.",',
-  '"whatItCosts":"2 sentences. Specific consequences if nothing changes.",',
-  '"whatChanges":"2 sentences. What becomes possible when they fix their top gaps. Specific to them."},',
-  '"ifNothingChanges":{',
-  '"fiveYear":"1-2 sentences. Where their health will realistically be in 5 years on current trajectory. Use data from Attia or Walker where relevant. Specific to their gaps.",',
-  '"tenYear":"1-2 sentences. Where their health will be in 10 years. More serious. What they risk losing - energy, capacity, independence, performance."},',
+  '"whatIsHappening":"3-4 sentences. This is a root-cause pattern analysis, not a symptom list. Go deeper than what they reported — identify the underlying pattern that connects the gaps. How are they feeding each other? What is actually driving this? Be direct and specific to what you observed. Read like an insight, not a verdict.",',
+  '"whatItCosts":"3-4 sentences. What these gaps are costing them RIGHT NOW — in daily energy, focus, recovery, mood, performance, relationships. Be specific and real. Not future timelines. Make it about what they are already experiencing and leaving on the table every single day. End with one sentence on where the pattern leads if it continues.",',
+  '"whatChanges":"2 sentences. What becomes possible when they fix their top gaps. Specific to them. Hopeful but grounded."},',
   '"lowestHangingFruit":{',
   '"habit":"The single highest leverage change they could make. 1 sentence describing the exact action.",',
   '"reason":"Why this one thing above all others. 2 sentences. How it cascades into other areas of their health.",',
@@ -1215,13 +1212,9 @@ function devMode() {
     pillarScores: { sleep:4, sunlight:6, movement:7, nutrition:4, stress:3, connection:6 },
     overallScore: 5,
     honestPicture: {
-      whatIsHappening: "You are running on a depleted system. Stress is sitting at the root of several other issues and your sleep is inconsistent enough to compound it every single day.",
-      whatItCosts: "Your cognitive performance, recovery capacity and emotional regulation are all taking a hit you have probably normalised. This is the pattern that quietly erodes potential over years.",
-      whatChanges: "Fix sleep and manage stress and almost every other metric in your profile improves without you changing anything else. That is how upstream these two gaps are."
-    },
-    ifNothingChanges: {
-      fiveYear: "In five years on this trajectory your fatigue becomes your baseline. Energy becomes something you manage rather than something you have.",
-      tenYear: "In ten years you risk losing the cognitive sharpness and physical resilience that underpin everything you care about. The compounding cost of unaddressed stress and poor sleep is measurable."
+      whatIsHappening: "The pattern here is not simply that you are tired or stressed — it is that your nervous system is not getting the recovery it needs to reset between demands. Stress is dysregulating your sleep, poor sleep is amplifying your stress response, and the two are reinforcing each other in a loop you have probably adapted around rather than resolved. Your nutrition is reactive because your energy is unreliable, and your energy is unreliable because the two primary regulators — sleep and stress — are both compromised. This is a system under load, not a collection of separate problems.",
+      whatItCosts: "Right now, this pattern is costing you cognitive sharpness — the slow thinking, reduced focus and decision fatigue you are probably experiencing are direct outputs of dysregulated sleep and cortisol. Your physical recovery is slower than it should be, meaning the training or activity you do put in yields less than it should. Emotionally, chronic stress without adequate recovery narrows your window of tolerance — things affect you more than they would if your system had more capacity. You are working harder than the results you are getting back. If this pattern continues, the gap between effort and output keeps widening.",
+      whatChanges: "Stabilise sleep and create even one reliable daily recovery practice and the downstream effects are immediate — clearer thinking, more consistent energy, better mood regulation, faster physical recovery. These two changes do not just fix sleep and stress. They unlock everything else."
     },
     lowestHangingFruit: {
       habit: "Wake at the same time every morning including weekends starting tomorrow.",
@@ -1371,27 +1364,16 @@ function renderResults() {
         '<div class="h-text">' + (hp.whatIsHappening||'') + '</div>' +
       '</div>' +
       '<div class="h-section">' +
-        '<div class="h-lbl red">Your Top Gaps And What They Cost You</div>' +
+        '<div class="h-lbl red">What This Is Costing You Right Now</div>' +
+        '<div class="h-text">' + (hp.whatItCosts||'') + '</div>' +
+      '</div>' +
+      '<div class="h-section">' +
+        '<div class="h-lbl red">Your Top Gaps</div>' +
         topGaps +
       '</div>' +
       '<div class="h-section">' +
         '<div class="h-lbl green">What Becomes Possible When You Fix This</div>' +
         '<div class="h-text">' + (hp.whatChanges||'') + '</div>' +
-      '</div>' +
-    '</div>' +
-
-    // If Nothing Changes
-    '<div class="ync-box">' +
-      '<div class="ync-title">If Nothing Changes</div>' +
-      '<div class="ync-grid">' +
-        '<div class="ync-period">' +
-          '<div class="ync-period-label">In 5 Years</div>' +
-          '<div class="ync-period-text">' + (ync.fiveYear||'') + '</div>' +
-        '</div>' +
-        '<div class="ync-period">' +
-          '<div class="ync-period-label">In 10 Years</div>' +
-          '<div class="ync-period-text">' + (ync.tenYear||'') + '</div>' +
-        '</div>' +
       '</div>' +
     '</div>' +
 
@@ -1628,28 +1610,28 @@ function renderHabits() {
         '<div class="exec-n">1</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Print your protocol and put it on the wall today</div>' +
-          '<div class="exec-step-body">Not later. Now. James Clear documents this consistently — deciding in advance exactly when and where you will perform a behaviour more than doubles follow-through. An environmental cue you cannot scroll past beats willpower every time.</div>' +
+          '<div class="exec-step-body">Not later. Now. Deciding exactly when and where you will do something more than doubles the chance you actually do it. A physical cue you cannot scroll past beats a reminder you can dismiss every time.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
         '<div class="exec-n">2</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Anchor each habit to something you already do</div>' +
-          '<div class="exec-step-body">BJ Fogg calls this anchoring — attaching a new behaviour to an existing one so it inherits the cue automatically. James Clear calls it habit stacking. Both researchers identify it as one of the most reliable behaviour change techniques available. After I wake up, I get morning light. After I finish work, I walk.</div>' +
+          '<div class="exec-step-body">Attach a new behaviour to an existing one and it inherits the cue automatically — no new reminder needed. After I wake up, I get morning light. After I finish work, I walk. Same anchor, same time, every day.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
         '<div class="exec-n">3</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Make it impossible to miss the cue</div>' +
-          '<div class="exec-step-body">James Clear\'s work on environment design is clear: your surroundings shape your behaviour more than your intentions do. Put your running shoes by the door. Set a phone alarm labelled with the habit. Make the right choice the obvious one before motivation is even required — because motivation will not always be there.</div>' +
+          '<div class="exec-step-body">Your surroundings shape your behaviour more than your intentions do. Put your running shoes by the door. Set an alarm labelled with the habit name. Make the right choice the obvious one — because motivation will not always be there, but a well-designed environment works even when you are tired.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
         '<div class="exec-n">4</div>' +
         '<div class="exec-body">' +
           '<div class="exec-step-title">Tick the box every day — that is the whole game</div>' +
-          '<div class="exec-step-body">James Clear calls it "never miss twice" — missing once is human, missing twice starts forming a new habit: the habit of not showing up. BJ Fogg adds that celebrating small completions, even briefly, reinforces the behaviour neurologically. One tick at a time. That is the whole mechanism.</div>' +
+          '<div class="exec-step-body">Missing once is human. Missing twice starts forming a new habit — the habit of not showing up. One tick at a time. That is the whole mechanism.</div>' +
         '</div>' +
       '</div>' +
       '<div class="exec-step">' +
@@ -1978,7 +1960,7 @@ function doPrint() {
     '<div class="cols">' +
       '<div class="col-left">' +
         '<div class="lbl">If Nothing Changes</div>' +
-        '<div style="font-size:' + fs(12) + ';line-height:1.6;color:#374151;margin-bottom:' + mb + ';font-style:italic;">' + (ync.fiveYear||hp.whatIsHappening||'') + '</div>' +
+        '<div style="font-size:' + fs(12) + ';line-height:1.6;color:#374151;margin-bottom:' + mb + ';font-style:italic;">' + (hp.whatItCosts||hp.whatIsHappening||'') + '</div>' +
         '<div class="rule-box">' +
           '<div class="rule-title">Never Miss Twice</div>' +
           '<div class="rule-body">One miss is human. Two in a row is a new pattern forming. That is the only rule that matters more than any other.</div>' +
