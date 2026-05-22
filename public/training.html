@@ -642,13 +642,6 @@ body {
 }
 .id-saved-text { font-size: 16px; color: var(--text); font-style: italic; line-height: 1.6; }
 
-/* If Nothing Changes */
-.ync-box { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--amber); border-radius: 8px; padding: 28px; margin-bottom: 16px; }
-.ync-title { font-family: var(--font-d); font-size: 26px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); margin-bottom: 20px; }
-.ync-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.ync-period { background: var(--bg2); border-radius: 6px; padding: 18px; border-left: 3px solid var(--amber); }
-.ync-period-label { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; }
-.ync-period-text { font-size: 15px; color: var(--text); line-height: 1.7; font-weight: 300; }
 
 /* Lowest Hanging Fruit */
 .lhf-box { background: linear-gradient(135deg, #082a16, var(--surface)); border: 1px solid var(--accent-dim); border-radius: 8px; padding: 28px; margin-bottom: 16px; }
@@ -733,8 +726,7 @@ body {
   .hab-wrap { padding: 24px 16px; }
   .hdr { padding: 12px 16px; }
   .land-title { font-size: clamp(52px, 14vw, 80px); }
-  .ync-grid { grid-template-columns: 1fr; }
-  .print-opt-cards { grid-template-columns: 1fr; }
+.print-opt-cards { grid-template-columns: 1fr; }
 }
 
 @media print {
@@ -1057,12 +1049,9 @@ var AP = [
   '{"pillarScores":{"adherence":7,"volume":5,"intensity":6,"frequency":6,"recovery":4,"nutrition":5},',
   '"overallScore":6,',
   '"honestPicture":{',
-  '"whatIsHappening":"2 sentences. Direct and factual. No sugarcoating. What pattern is showing up.",',
-  '"whatItCosts":"2 sentences. Specific consequences if nothing changes.",',
-  '"whatChanges":"2 sentences. What becomes possible when they fix their top gaps. Specific to them."},',
-  '"ifNothingChanges":{',
-  '"fiveYear":"1-2 sentences. Where their health will realistically be in 5 years on current trajectory. Use data from Attia or Walker where relevant. Specific to their gaps.",',
-  '"tenYear":"1-2 sentences. Where their health will be in 10 years. More serious. What they risk losing - energy, capacity, independence, performance."},',
+  '"whatIsHappening":"3-4 sentences. This is a root-cause pattern analysis, not a symptom list. Go deeper than what they reported — identify the underlying pattern connecting the training gaps. How are they feeding each other? What is actually driving the stagnation or inefficiency? Be direct and specific to what you observed. Read like a coach insight, not a verdict.",',
+  '"whatItCosts":"3-4 sentences. What these gaps are costing them RIGHT NOW — in lost adaptation, wasted sessions, slower recovery, plateauing results, reduced performance. Be specific and real. Not future timelines. What are they already experiencing and leaving on the table every single session. End with one sentence on where this pattern leads if they keep going.",',
+  '"whatChanges":"2 sentences. What becomes possible when they fix their top gaps. Specific to them. Hopeful but grounded."},',
   '"lowestHangingFruit":{',
   '"habit":"The single highest leverage change they could make. 1 sentence describing the exact action.",',
   '"reason":"Why this one thing above all others. 2 sentences. How it cascades into other areas of their health.",',
@@ -1221,13 +1210,9 @@ function devMode() {
     pillarScores: { adherence:4, volume:5, intensity:7, frequency:5, recovery:4, nutrition:5 },
     overallScore: 5,
     honestPicture: {
-      whatIsHappening: "You are training hard but not smart. Effort is there — the structure around it is not. Volume is inconsistent, recovery is an afterthought, and you are not progressing because the foundations under your training are shaky.",
-      whatItCosts: "Inconsistent volume and poor recovery means you are accumulating fatigue without accumulating adaptation. You are spending the energy without banking the results.",
-      whatChanges: "Get adherence and volume right and the effort you are already putting in starts producing results that match it. That is the leverage point."
-    },
-    ifNothingChanges: {
-      fiveYear: "In five years on this trajectory your strength plateaus and your training history becomes a cycle of effort followed by stagnation. Hard work without the right structure stops compounding.",
-      tenYear: "In ten years you risk losing the muscle mass and metabolic capacity that protects your health and performance. Helms and Patrick both point to the same thing — progressive overload over time is the insurance policy."
+      whatIsHappening: "You are training with enough intensity to feel like you are working hard, but the structure underneath is too inconsistent to accumulate real adaptation. The pattern here is effort without architecture — sessions happen, but volume fluctuates enough that your body cannot build on a reliable stimulus. Recovery is not being treated as part of training, which means you are frequently beginning sessions already in a deficit. The result is a training history that looks active on the surface but is not producing the progression it should.",
+      whatItCosts: "Right now this is costing you adaptation. Every session you complete while under-recovered is a session producing less than half the stimulus it could. Inconsistent volume means you are likely hovering around your minimum effective volume without ever spending sustained time above it, where real hypertrophy happens. You are putting in the sessions and the effort and getting back a fraction of what that work should produce. If this pattern continues, you plateau — not because you stopped trying, but because the structure stopped supporting the work.",
+      whatChanges: "Fix adherence and volume structure and the effort you are already putting in starts compounding properly. That is the shift — from working hard to working hard in a way that actually builds."
     },
     lowestHangingFruit: {
       habit: "Log every session — weights, sets and reps — starting this week.",
@@ -1315,7 +1300,6 @@ function renderResults() {
   if (!S.analysis) return;
   var d = S.analysis;
   var hp = d.honestPicture || {};
-  var ync = d.ifNothingChanges || {};
   var lhf = d.lowestHangingFruit || {};
   var wrap = document.getElementById('res-wrap');
 
@@ -1374,27 +1358,16 @@ function renderResults() {
         '<div class="h-text">' + (hp.whatIsHappening||'') + '</div>' +
       '</div>' +
       '<div class="h-section">' +
+        '<div class="h-lbl red">What This Is Costing You Right Now</div>' +
+        '<div class="h-text">' + (hp.whatItCosts||'') + '</div>' +
+      '</div>' +
+      '<div class="h-section">' +
         '<div class="h-lbl red">Your Top Gaps And What They Cost You</div>' +
         topGaps +
       '</div>' +
       '<div class="h-section">' +
         '<div class="h-lbl green">What Becomes Possible When You Fix This</div>' +
         '<div class="h-text">' + (hp.whatChanges||'') + '</div>' +
-      '</div>' +
-    '</div>' +
-
-    // If Nothing Changes
-    '<div class="ync-box">' +
-      '<div class="ync-title">If Nothing Changes</div>' +
-      '<div class="ync-grid">' +
-        '<div class="ync-period">' +
-          '<div class="ync-period-label">In 5 Years</div>' +
-          '<div class="ync-period-text">' + (ync.fiveYear||'') + '</div>' +
-        '</div>' +
-        '<div class="ync-period">' +
-          '<div class="ync-period-label">In 10 Years</div>' +
-          '<div class="ync-period-text">' + (ync.tenYear||'') + '</div>' +
-        '</div>' +
       '</div>' +
     '</div>' +
 
@@ -1480,9 +1453,11 @@ function renderResults() {
     // Print options
     '<div class="print-opts-box">' +
       '<div class="print-opts-title">Your Protocol</div>' +
-      '<div class="print-opts-body">Once you have generated your plan, print it and put it somewhere you cannot ignore.</div>' +
-      '<div id="print-actions" style="display:none;">' +
-        '<button class="btn btn-green" id="btn-print-wall">PRINT YOUR PROTOCOL</button>' +
+      '<div class="print-opts-body">Select your habits above then generate your plan. Once ready, preview it full-size or print it directly — then head to My Plan to start tracking.</div>' +
+      '<div id="print-actions" style="display:none;flex-direction:column;gap:10px;margin-top:16px;">' +
+        '<button class="btn btn-outline" id="btn-preview-wall" style="width:100%;justify-content:center;">PREVIEW MY PROTOCOL</button>' +
+        '<button class="btn btn-outline" id="btn-print-wall" style="width:100%;justify-content:center;">PRINT PROTOCOL</button>' +
+        '<button class="btn btn-green" id="btn-vp" style="width:100%;justify-content:center;margin-top:4px;">GO TO MY PLAN &rarr;</button>' +
       '</div>' +
     '</div>';
 
@@ -1508,6 +1483,7 @@ function renderResults() {
 
   on('btn-gen-plan', function() { generatePlan(); });
   on('btn-vp', function() { go('habits'); });
+  on('btn-preview-wall', function() { previewProtocol(); });
   on('btn-print-wall', function() { doPrint(); });
   on('btn-print-tracker', function() { doTracker(); });
   on('btn-dl-sheet', function() { doSpreadsheet(); });
@@ -1592,7 +1568,7 @@ function generatePlan() {
 
   // Show print actions
   var pa = document.getElementById('print-actions');
-  if (pa) pa.style.display = 'block';
+  if (pa) pa.style.display = 'flex';
 
   // Scroll to print section
   var po = document.querySelector('.print-opts-box');
@@ -1880,14 +1856,24 @@ function printSection() {
   '<div id="pa4-content" style="display:none;">' + a4 + '</div>';
 }
 
+function previewProtocol() {
+  if (!S.analysis || !S.habits || !S.habits.length) {
+    alert('Please select your habits first.');
+    return;
+  }
+  doPrint._preview = true;
+  doPrint();
+  doPrint._preview = false;
+}
+
 function doPrint() {
+  var isPreview = doPrint._preview;
   if (!S.analysis || !S.habits || !S.habits.length) {
     alert('Please select your habits first.');
     return;
   }
   var d = S.analysis;
   var hp = d.honestPicture || {};
-  var ync = d.ifNothingChanges || {};
   var today = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
   var identity = S.userIdentity || d.identityStatement || '';
 
@@ -1958,8 +1944,8 @@ function doPrint() {
 
     '<div class="cols">' +
       '<div class="col-left">' +
-        '<div class="lbl">If Nothing Changes</div>' +
-        '<div style="font-size:' + fs(12) + ';line-height:1.6;color:#374151;margin-bottom:' + mb + ';font-style:italic;">' + (ync.fiveYear||hp.whatIsHappening||'') + '</div>' +
+        '<div class="lbl">What This Is Costing You Right Now</div>' +
+        '<div style="font-size:' + fs(12) + ';line-height:1.6;color:#374151;margin-bottom:' + mb + ';font-style:italic;">' + (hp.whatItCosts||hp.whatIsHappening||'') + '</div>' +
         '<div class="rule-box">' +
           '<div class="rule-title">Never Miss Twice</div>' +
           '<div class="rule-body">One miss is human. Two in a row is a new pattern forming. That is the only rule that matters more than any other.</div>' +
@@ -1995,7 +1981,7 @@ function doPrint() {
   printWin.document.write(a4html);
   printWin.document.close();
   printWin.focus();
-  setTimeout(function() { printWin.print(); }, 500);
+  if (!isPreview) setTimeout(function() { printWin.print(); }, 500);
 }
 
 function doTracker() {
