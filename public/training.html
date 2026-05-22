@@ -1455,6 +1455,7 @@ function renderResults() {
       '<div class="print-opts-body">Select your habits above then generate your plan. Once ready, preview it full-size or print it directly — then head to My Plan to start tracking.</div>' +
       '<div id="print-actions" style="display:none;flex-direction:column;gap:10px;margin-top:16px;">' +
         '<button class="btn btn-outline" id="btn-preview-wall" style="width:100%;justify-content:center;">PREVIEW MY PROTOCOL</button>' +
+        '<button class="btn btn-outline" id="btn-download-wall" style="width:100%;justify-content:center;">DOWNLOAD PDF</button>' +
         '<button class="btn btn-outline" id="btn-print-wall" style="width:100%;justify-content:center;">PRINT PROTOCOL</button>' +
         '<button class="btn btn-green" id="btn-vp" style="width:100%;justify-content:center;margin-top:4px;">GO TO MY PLAN &rarr;</button>' +
       '</div>' +
@@ -1483,6 +1484,7 @@ function renderResults() {
   on('btn-gen-plan', function() { generatePlan(); });
   on('btn-vp', function() { go('habits'); });
   on('btn-preview-wall', function() { previewProtocol(); });
+  on('btn-download-wall', function() { doDownload(); });
   on('btn-print-wall', function() { doPrint(); });
   on('btn-print-tracker', function() { doTracker(); });
   on('btn-dl-sheet', function() { doSpreadsheet(); });
@@ -1865,8 +1867,19 @@ function previewProtocol() {
   doPrint._preview = false;
 }
 
+function doDownload() {
+  if (!S.analysis || !S.habits || !S.habits.length) {
+    alert('Please select your habits first.');
+    return;
+  }
+  doPrint._download = true;
+  doPrint();
+  doPrint._download = false;
+}
+
 function doPrint() {
   var isPreview = doPrint._preview;
+  var isDownload = doPrint._download;
   if (!S.analysis || !S.habits || !S.habits.length) {
     alert('Please select your habits first.');
     return;
@@ -1976,6 +1989,19 @@ function doPrint() {
 
     '</div></body></html>';
 
+  if (isDownload) {
+    var dlHtml = a4html.replace('</body></html>',
+      '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>' +
+      '<script>window.addEventListener("load",function(){' +
+        'html2pdf().set({margin:10,filename:"training-protocol.pdf",jsPDF:{unit:"mm",format:"a4",orientation:"landscape"}})' +
+        '.from(document.querySelector(".page")).save().then(function(){setTimeout(function(){window.close();},500);});' +
+      '});<\/script></body></html>'
+    );
+    var dlWin = window.open('', '_blank');
+    dlWin.document.write(dlHtml);
+    dlWin.document.close();
+    return;
+  }
   var printWin = window.open('', '_blank');
   printWin.document.write(a4html);
   printWin.document.close();
